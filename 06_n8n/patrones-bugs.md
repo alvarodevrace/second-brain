@@ -1,0 +1,106 @@
+# Patrones críticos y bugs conocidos — n8n
+
+> Guía de referencia para CODO y CLAU. Aquí viven los patrones que queman tiempo si no se conocen.
+
+---
+
+## Patrones de nodos Supabase
+
+### UPDATE — usar `fieldsUi.fieldValues` (NO `fieldsUi.values`)
+
+El nodo Supabase para UPDATE espera la estructura:
+
+```json
+{
+  "fieldsUi": {
+    "fieldValues": [
+      { "fieldId": "campo", "fieldValue": "valor" }
+    ]
+  }
+}
+```
+
+**Incorrecto** (genera error silencioso): usar `fieldsUi.values`.
+
+---
+
+### INSERT después de UPDATE — usar HTTP Request REST
+
+Si en un mismo flujo hay un UPDATE de Supabase seguido de un INSERT, **no usar el nodo Supabase para el INSERT**. Usar un nodo HTTP Request con la REST API de Supabase directamente.
+
+**Por qué:** el nodo Supabase pierde el `pairedItem` chain después de ciertos nodos UPDATE, lo que rompe el mapeo de datos en el INSERT subsiguiente.
+
+Ejemplo de endpoint REST:
+```
+POST https://bxatcmcommoqnxnyqchu.supabase.co/rest/v1/historial_pagos
+Authorization: Bearer <service_role_key>
+Content-Type: application/json
+```
+
+---
+
+## Patrones de nodos HTTP Request
+
+### typeVersion — mantener en v4.2
+
+**No actualizar** el nodo HTTP Request a typeVersion `v4.4`. La versión v4.4 introduce cambios en el manejo de headers y body que rompen integraciones existentes.
+
+Versión segura: `"typeVersion": 4.2`
+
+---
+
+## Patrones de Gmail
+
+### Agregar `parameters.operation: "send"` explícito
+
+El nodo Gmail no siempre infiere la operación correctamente. Siempre agregar:
+
+```json
+{
+  "parameters": {
+    "operation": "send",
+    ...resto de params
+  }
+}
+```
+
+Sin esto, el nodo puede fallar silenciosamente o ejecutar una operación incorrecta.
+
+---
+
+## Patrones de expresiones y Code nodes
+
+### `$env.*` — funciona en expresiones, NO en Code nodes
+
+En **expresiones** de nodos (campo de texto con `{{ }}`): `$env.MI_VAR` funciona correctamente.
+
+En **Code nodes** (JavaScript): `$env` no está disponible. Usar `$vars` o pasar el valor como parámetro desde un nodo anterior.
+
+---
+
+## Patrones de Coolify
+
+### Actualizar env vars en bulk
+
+```
+PATCH /api/v1/services/{uuid}/envs/bulk
+```
+
+Este endpoint funciona correctamente para actualizar múltiples env vars de un servicio en una sola llamada. Es el método recomendado para sincronizar configuración desde el admin panel.
+
+---
+
+## Comportamientos conocidos de Evolution API
+
+### Shape de respuesta de instancias
+
+No asumir shape anidado `instance.instanceName`. El contrato real incluye:
+- `name`
+- `connectionStatus`
+
+Verificar contra respuesta real si el contrato cambia.
+
+---
+
+*Owner: CODO (mantenimiento) · CLAU (plataforma)*
+*Última actualización: 2026-03-13*
