@@ -49,6 +49,31 @@ Versión segura: `"typeVersion": 4.2`
 
 ---
 
+### ❌ n8n REST API `/workflows/:id/run` no existe
+
+La API pública de n8n v1 NO tiene endpoint para ejecutar un workflow directamente.
+Llamar `POST /api/v1/workflows/:id/run` devuelve `405 POST method not allowed`.
+
+**Patrón correcto desde BFF NestJS:**
+- Usar el **webhook trigger** del workflow
+- Llamar `POST {N8N_BASE_URL_sin_api_v1}/webhook/{path_del_nodo_webhook}`
+- No enviar `X-N8N-API-KEY` en webhooks (son públicos)
+
+**La API REST solo sirve para:**
+- `GET /api/v1/workflows` — listar workflows
+- `GET /api/v1/workflows/:id` — leer un workflow
+- `GET /api/v1/executions` — consultar ejecuciones
+
+**En env.ts del BFF:**
+```typescript
+get n8nWebhookBaseUrl() {
+  return env.n8nBaseUrl.replace(/\/api\/v1\/?$/, '') + '/webhook';
+}
+```
+Detectado: 2026-03-15 en `POST /api/v1/clients/C001/send-reminder`
+
+---
+
 ## Patrones de Gmail
 
 ### Agregar `parameters.operation: "send"` explícito
@@ -78,6 +103,30 @@ En **Code nodes** (JavaScript): `$env` no está disponible. Usar `$vars` o pasar
 
 ---
 
+### ⚠️ Teléfonos: siempre sin prefijo `+`
+
+Toda la plataforma usa números de teléfono **sin** prefijo `+`:
+- `clientes.telefono_whatsapp` → `593960463743`
+- `conversaciones_whatsapp.telefono_whatsapp` → `593960463743`
+- Evolution API campo `number` → `593960463743`
+
+Evolution API devuelve el número como `593960463743@s.whatsapp.net`.
+Al hacer `remoteJid.split('@')[0]` se obtiene `593960463743` — **NO agregar `+`**.
+
+**En WF3 nodo `Parsear Mensaje WA`:**
+```javascript
+const rawPhone = remoteJid.split('@')[0];
+const phone = rawPhone.replace(/^\+/, '');  // ✅ correcto
+// NO: rawPhone.startsWith('+') ? rawPhone : '+' + rawPhone  ❌
+```
+
+Si se agrega `+`, `Buscar Conv Activa` nunca encuentra la conversación creada por WF1
+→ siempre `estado: sin_contexto` → el atleta no recibe respuesta de la IA.
+
+Detectado y corregido: 2026-03-15 en WF3 ejecuciones 1407–1412
+
+---
+
 ## Patrones de Coolify
 
 ### Actualizar env vars en bulk
@@ -103,4 +152,4 @@ Verificar contra respuesta real si el contrato cambia.
 ---
 
 *Owner: CODO (mantenimiento) · CLAU (plataforma)*
-*Última actualización: 2026-03-13*
+*Última actualización: 2026-03-19*
