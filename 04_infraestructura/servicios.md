@@ -8,6 +8,7 @@
 
 - **Coolify:** `https://coolify.alvarodevrace.tech`
 - **VPS IP:** `72.60.26.201`
+- **Dominio producción:** `jauriacrossfitness.com` (Cloudflare DNS pendiente)
 
 ---
 
@@ -19,7 +20,7 @@
 |---|---|
 | URL | `https://n8n.alvarodevrace.tech` |
 | API key | → `MEMORY.md` del proyecto / Coolify env vars |
-| Workflows activos | 5 (ver `06_n8n/workflows.md`) |
+| Workflows activos | 9 (ver `06_n8n/workflows.md`) |
 
 ### Evolution API (WhatsApp)
 
@@ -38,6 +39,7 @@
 | URL | `https://bxatcmcommoqnxnyqchu.supabase.co` |
 | Anon key | → `MEMORY.md` del proyecto |
 | Service role key | → Coolify env vars (NUNCA en frontend) |
+| Admin nuevo | `alvarodevrace@outlook.com` |
 
 ### NestJS BFF (`admin/back/jauria-api`)
 
@@ -51,11 +53,9 @@
 | Campo | Valor |
 |---|---|
 | URL | `https://glitchtip.alvarodevrace.tech` |
-| Coolify service UUID | `q8o8k8w00s8osgsgk4wgo484` |
-| Proyecto Coolify | stack tools / production |
 | Org | `jauria-crossfit` |
 | Proyecto | `jauria-admin` (ID 1) |
-| Admin | `alcarreram@outlook.com` |
+| Admin | `alvarodevrace@outlook.com` |
 | DSN | → `MEMORY.md` del proyecto |
 | Compatibilidad | SDK `@sentry/angular` compatible |
 
@@ -81,9 +81,13 @@ Flujo: `develop → PR → qa → PR → main` (nunca commitear directo a main)
 
 ---
 
-## DNS pendiente
+## Servicios en Producción (jauriacrossfitness.com)
 
-- A record `glitchtip.alvarodevrace.tech → 72.60.26.201` en Hostinger (verificar si ya está activo)
+| Servicio | URL | Estado |
+|---|---|---|
+| Landing | https://jauriacrossfitness.com | ⏳ DNS pending |
+| Admin panel | https://admin.jauriacrossfitness.com | ⏳ DNS pending |
+| BFF API | https://api.jauriacrossfitness.com | ⏳ DNS pending |
 
 ---
 
@@ -91,6 +95,8 @@ Flujo: `develop → PR → qa → PR → main` (nunca commitear directo a main)
 
 - Actualizar env vars en Coolify: `PATCH /api/v1/services/{uuid}/envs/bulk`
 - Coolify API token: → `MEMORY.md` del proyecto
+- Backup Supabase: `scripts/backup-supabase.sh` (diario 3:30 AM)
+- Backup n8n: `scripts/backup-n8n.sh` (diario 3:00 AM)
 
 ---
 
