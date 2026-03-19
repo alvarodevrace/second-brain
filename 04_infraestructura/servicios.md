@@ -39,6 +39,13 @@
 | Anon key | → `MEMORY.md` del proyecto |
 | Service role key | → Coolify env vars (NUNCA en frontend) |
 
+### NestJS BFF (`admin/back/jauria-api`)
+
+- Puerto: 4400 (local) | deploy: pendiente Coolify
+- Env relevante: `N8N_MANUAL_REMINDER_WEBHOOK_PATH=recordatorio-manual`
+- Para disparar workflows n8n: usar `N8nService.triggerWebhook(path, payload)` — NO `runWorkflow`
+- Endpoint activo: `POST /api/v1/clients/:id/send-reminder` → llama webhook WF6
+
 ### GlitchTip (error monitoring)
 
 | Campo | Valor |
@@ -88,4 +95,4 @@ Flujo: `develop → PR → qa → PR → main` (nunca commitear directo a main)
 ---
 
 *Owner: CLAU*
-*Última actualización: 2026-03-13*
+*Última actualización: 2026-03-19*
