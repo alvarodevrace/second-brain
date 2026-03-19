@@ -18,7 +18,7 @@
 |---|---|---|---|---|
 | `GzmYUYGMG1X8wnTm` | WF1 - Recordatorio de Cobro | 24 | ✅ Activo | — |
 | `ocfhDTSpWQN99ieE` | WF2 - Webhook Payphone | 22 | ✅ Activo | — |
-| `VBwhzSYheRZOnK6U` | WF3 - Validación Comprobantes WhatsApp | 31 | ✅ v8 2026-03-09 | ALV-48 ✅ |
+| `VBwhzSYheRZOnK6U` | WF3 - Validación Comprobantes WhatsApp | 34 | ✅ v9 2026-03-15 | ALV-48 ✅ |
 | `es47dKkLiEyuzsLf` | WF4 - Notificaciones al Coach | 7 | ✅ Activo | — |
 | `a0KGcLv4yAXBsZAW` | WF5 - Error Handler | 4 | ✅ Activo | — |
 
@@ -41,16 +41,18 @@
 
 - **Trigger:** Webhook (Evolution API → mensaje entrante)
 - **Propósito:** Validar comprobantes de pago enviados por WhatsApp con IA (OpenRouter)
-- **Nodos:** 31 (v8 — versión estable)
+- **Nodos:** 34 (v9 — versión estable)
+- **Motor IA:** Qwen Vision 72B vía OpenRouter (confirmado 2026-03-15)
 - **Tablas Supabase:** `clientes`, `historial_pagos`, `conversaciones_whatsapp`
 - **Canales:** Evolution API, OpenRouter
+- **Nota crítica:** bug de teléfono corregido 2026-03-15 — `Parsear Mensaje WA` normaliza sin `+`
 - **Backup:** `wf3_complete.json` en raíz del repo JauriaCrossfit
 
 ## WF4 — Notificaciones al Coach
 
 - **Trigger:** Llamado por otros workflows (WF2, WF3)
 - **Propósito:** Notificar al coach por Gmail sobre eventos importantes
-- **Nota crítica:** Requiere `parameters.operation: "send"` explícito en nodo Gmail
+- **Nota crítica:** Requiere `parameters.operation: \"send\"` explícito en nodo Gmail
 
 ## WF5 — Error Handler
 
@@ -69,4 +71,4 @@
 ---
 
 *Owner: CODO (ejecución) · CLAU (deploy / credenciales)*
-*Última actualización: 2026-03-13*
+*Última actualización: 2026-03-19*
